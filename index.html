@@ -3,223 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super-Bot Control Panel</title>
+    <title>Panneau de Contrôle - Super-Bot Radio</title>
     <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --panel-bg: #16213e;
+            --accent-color: #0f3460;
+            --text-color: #e94560;
+            --text-light: #ffffff;
+            --success-color: #4cd137;
+            --danger-color: #e84118;
+        }
+
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #0f0f12;
-            color: #f1f1f7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-light);
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        h1 {
-            color: #7289da;
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            color: #aaa;
-            margin-bottom: 30px;
-            font-size: 0.95rem;
-        }
-        .dashboard {
-            background: #181820;
-            border-radius: 16px;
-            padding: 30px;
+
+        .container {
+            max-width: 800px;
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            border: 1px solid #2a2a35;
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        .status-container {
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .status-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #2a2a35;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            background: #ff4d4d;
-        }
-        .status-badge.online {
-            background: #2ec4b6;
-            color: #0f0f12;
-        }
-        .info-group {
-            margin-bottom: 20px;
-        }
-        .label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #7289da;
-            letter-spacing: 0.5px;
-            margin-bottom: 5px;
-        }
-        .value {
-            font-size: 1.1rem;
-            font-weight: 500;
-            background: #111116;
-            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 15px 20px;
             border-radius: 8px;
-            border: 1px solid #22222b;
-            word-break: break-word;
+            margin-bottom: 25px;
         }
-        .form-group {
-            margin-top: 25px;
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--danger-color);
+            box-shadow: 0 0 10px var(--danger-color);
+        }
+
+        .dot.online {
+            background-color: var(--success-color);
+            box-shadow: 0 0 10px var(--success-color);
+        }
+
+        .info-panel {
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        .info-item span {
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .control-section {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
         }
+
         input[type="text"] {
-            background: #111116;
-            border: 1px solid #3a3a4a;
-            padding: 12px;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1rem;
-            transition: border 0.2s;
-        }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #7289da;
-        }
-        button {
-            background: #7289da;
-            color: #fff;
+            width: 100%;
+            padding: 15px;
             border: none;
-            padding: 12px;
             border-radius: 8px;
-            font-size: 1rem;
+            background: var(--accent-color);
+            color: white;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]::placeholder {
+            color: #bbb;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
         }
-        button:hover {
-            background: #5b73c7;
+
+        .btn-inject {
+            background-color: var(--text-color);
+            color: white;
         }
+
+        .btn-inject:hover {
+            background-color: #ff5773;
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.4);
+        }
+
         .btn-skip {
-            background: #e63946;
-            margin-top: 10px;
+            background-color: #6c757d;
+            color: white;
         }
+
         .btn-skip:hover {
-            background: #c82333;
+            background-color: #5a6268;
         }
-        .alert {
-            font-size: 0.9rem;
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 6px;
-            display: none;
+
+        .log-box {
+            margin-top: 25px;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            max-height: 150px;
+            overflow-y: auto;
+            border-left: 4px solid var(--text-color);
         }
-        .alert.success { background: rgba(46, 196, 182, 0.2); color: #2ec4b6; }
-        .alert.error { background: rgba(230, 57, 70, 0.2); color: #e63946; }
     </style>
 </head>
 <body>
 
-    <h1>🤖 Super-Bot Hub</h1>
-    <div class="subtitle">YouTube • Spotify • Deezer Fusion Playlist</div>
+    <div class="container">
+        <h1>🎵 Super-Bot Radio</h1>
 
-    <div class="dashboard">
-        <div class="status-container">
-            <span>État du Système</span>
-            <div id="status" class="status-badge">Hors ligne</div>
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div id="statusDot" class="dot"></div>
+                <span id="statusText">DÉCONNECTÉ</span>
+            </div>
+            <div>API: <span id="apiUrl">mybotsradio.onrender.com</span></div>
         </div>
 
-        <div class="info-group">
-            <div class="label">🔊 En cours de diffusion :</div>
-            <div id="current" class="value">Aucune donnée</div>
+        <div class="info-panel">
+            <div class="info-item">📻 Lecture actuelle : <span id="currentSong">Aucune</span></div>
+            <div class="info-item">⏭️ Prochaine musique : <span id="nextSong">Aucune</span></div>
         </div>
 
-        <div class="info-group">
-            <div class="label">⏭️ Prochain titre :</div>
-            <div id="next" class="value" style="color: #aaa;">Aucune donnée</div>
+        <div class="control-section">
+            <input type="text" id="musicUrl" placeholder="Collez un lien YouTube, Spotify ou Deezer (Titre, Album, Playlist)...">
+            
+            <div class="btn-group">
+                <button class="btn-inject" onclick="injectMusic()">🚀 Injecter dans la Radio</button>
+                <button class="btn-skip" onclick="skipMusic()">⏭️ Passer</button>
+            </div>
         </div>
 
-        <div class="form-group">
-            <div class="label">Ajouter une playlist ou un titre :</div>
-            <input type="text" id="url-input" placeholder="Colle un lien YT, Spotify ou Deezer...">
-            <button onclick="addMusic()">Injecter dans la Playlist</button>
-            <button class="btn-skip" onclick="skipMusic()">Passer le morceau actuel</button>
-            <div id="alert-box" class="alert"></div>
+        <div class="log-box" id="logBox">
+            [Système] Prêt. Connectez le bot sur Discord avec la commande !music play pour commencer.
         </div>
     </div>
 
     <script>
-        // ⚠️ REMPLACE PAR L'URL UNIQUE DE TON NOUVEAU BOT SUR RENDER
-        const BASE_URL = "https://bot-radio-unique-id.onrender.com"; 
+        // CONFIGURATION DU LIEN RENDER DE TON BOT
+        const BASE_URL = "https://mybotsradio.onrender.com";
 
-        async function fetchStatus() {
+        function addLog(text) {
+            const logBox = document.getElementById('logBox');
+            logBox.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${text}`;
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        async function checkStatus() {
             try {
-                const res = await fetch(`${BASE_URL}/status`);
-                const data = await res.json();
-                
-                const badge = document.getElementById('status');
-                badge.textContent = "En ligne";
-                badge.className = "status-badge online";
-                
-                document.getElementById('current').textContent = data.currentSong;
-                document.getElementById('next').textContent = data.nextSong;
+                const response = await fetch(`${BASE_URL}/status`);
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+
+                document.getElementById('statusDot').className = "dot online";
+                document.getElementById('statusText').innerText = "EN LIGNE";
+                document.getElementById('currentSong').innerText = data.currentSong || "Aucune";
+                document.getElementById('nextSong').innerText = data.nextSong || "Aucune";
             } catch (err) {
-                const badge = document.getElementById('status');
-                badge.textContent = "Hors ligne";
-                badge.className = "status-badge";
+                document.getElementById('statusDot').className = "dot";
+                document.getElementById('statusText').innerText = "DÉCONNECTÉ";
+                document.getElementById('currentSong').innerText = "Aucune (Bot éteint)";
+                document.getElementById('nextSong').innerText = "Aucune";
             }
         }
 
-        async function addMusic() {
-            const input = document.getElementById('url-input');
-            const alertBox = document.getElementById('alert-box');
-            const url = input.value.trim();
-            if(!url) return;
+        async function injectMusic() {
+            const urlInput = document.getElementById('musicUrl');
+            const url = urlInput.value.trim();
 
-            showAlert("Envoi du lien et extraction de la playlist en cours...", "success");
+            if (!url) {
+                alert("Veuillez entrer un lien valide !");
+                return;
+            }
 
+            addLog("Envoi de la demande d'injection...");
+            
             try {
-                const res = await fetch(`${BASE_URL}/api/play`, {
+                const response = await fetch(`${BASE_URL}/api/play`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: url })
                 });
-                const data = await res.json();
-                if(data.success) {
-                    showAlert(data.message, "success");
-                    input.value = "";
-                    fetchStatus();
+
+                const data = await response.json();
+                if (response.ok) {
+                    addLog(data.message);
+                    urlInput.value = "";
                 } else {
-                    showAlert(data.error, "error");
+                    addLog(`❌ Erreur : ${data.error}`);
+                    alert(data.error);
                 }
             } catch (err) {
-                showAlert("Erreur réseau ou bot éteint.", "error");
+                addLog("❌ Impossible de joindre le bot Render. Vérifiez qu'il est bien allumé.");
             }
+            checkStatus();
         }
 
         async function skipMusic() {
+            addLog("Demande de passage à la musique suivante...");
             try {
-                await fetch(`${BASE_URL}/api/skip`, { method: 'POST' });
-                showAlert("Commande Skip envoyée !", "success");
-                setTimeout(fetchStatus, 1000);
+                const response = await fetch(`${BASE_URL}/api/skip`, { method: 'POST' });
+                if (response.ok) {
+                    addLog("⏭️ Commande Skip envoyée au bot !");
+                }
             } catch (err) {
-                showAlert("Impossible de passer la musique.", "error");
+                addLog("❌ Erreur lors de la demande de Skip.");
             }
+            setTimeout(checkStatus, 1000);
         }
 
-        function showAlert(text, type) {
-            const alertBox = document.getElementById('alert-box');
-            alertBox.textContent = text;
-            alertBox.className = `alert ${type}`;
-            alertBox.style.display = "block";
-        }
-
-        setInterval(fetchStatus, 4000);
-        fetchStatus();
+        // Vérification automatique toutes les 5 secondes
+        setInterval(checkStatus, 5000);
+        checkStatus();
     </script>
 </body>
 </html>
