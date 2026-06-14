@@ -14,7 +14,7 @@
             --success-color: #4cd137;
             --danger-color: #e84118;
         }
-
+        * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
@@ -25,7 +25,6 @@
             flex-direction: column;
             align-items: center;
         }
-
         .container {
             max-width: 800px;
             width: 100%;
@@ -34,7 +33,6 @@
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-
         h1 {
             text-align: center;
             color: var(--text-color);
@@ -42,7 +40,6 @@
             text-transform: uppercase;
             letter-spacing: 2px;
         }
-
         .status-bar {
             display: flex;
             justify-content: space-between;
@@ -51,220 +48,249 @@
             padding: 15px 20px;
             border-radius: 8px;
             margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-
         .status-indicator {
             display: flex;
             align-items: center;
             gap: 10px;
             font-weight: bold;
         }
-
         .dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
             background-color: var(--danger-color);
             box-shadow: 0 0 10px var(--danger-color);
+            flex-shrink: 0;
         }
-
         .dot.online {
             background-color: var(--success-color);
             box-shadow: 0 0 10px var(--success-color);
         }
-
         .info-panel {
+            background: rgba(0,0,0,0.15);
+            padding: 15px 20px;
+            border-radius: 8px;
             margin-bottom: 25px;
         }
-
         .info-item {
-            margin: 10px 0;
-            font-size: 1.1em;
+            margin: 8px 0;
+            font-size: 1.05em;
         }
-
-        .info-item span {
-            color: var(--text-color);
-            font-weight: bold;
-        }
-
+        .info-item span { color: var(--text-color); font-weight: bold; }
         .control-section {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
-
         input[type="text"] {
             width: 100%;
-            padding: 15px;
+            padding: 14px 15px;
             border: none;
             border-radius: 8px;
             background: var(--accent-color);
             color: white;
             font-size: 1em;
-            box-sizing: border-box;
         }
-
-        input[type="text"]::placeholder {
-            color: #bbb;
-        }
-
+        input[type="text"]::placeholder { color: #bbb; }
+        input[type="text"]:focus { outline: 2px solid var(--text-color); }
         .btn-group {
             display: flex;
-            gap: 15px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-
         button {
             flex: 1;
-            padding: 15px;
+            min-width: 120px;
+            padding: 14px;
             border: none;
             border-radius: 8px;
-            font-size: 1em;
+            font-size: 0.95em;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             text-transform: uppercase;
         }
-
-        .btn-inject {
-            background-color: var(--text-color);
-            color: white;
+        .btn-inject { background-color: var(--text-color); color: white; }
+        .btn-inject:hover { background-color: #ff5773; box-shadow: 0 0 15px rgba(233,69,96,0.4); }
+        .btn-skip { background-color: #6c757d; color: white; }
+        .btn-skip:hover { background-color: #5a6268; }
+        .btn-stop { background-color: #8b0000; color: white; }
+        .btn-stop:hover { background-color: #a00; }
+        .queue-section {
+            margin-top: 20px;
+            background: rgba(0,0,0,0.15);
+            padding: 15px;
+            border-radius: 8px;
         }
-
-        .btn-inject:hover {
-            background-color: #ff5773;
-            box-shadow: 0 0 15px rgba(233, 69, 96, 0.4);
-        }
-
-        .btn-skip {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-skip:hover {
-            background-color: #5a6268;
-        }
-
+        .queue-title { color: var(--text-color); font-weight: bold; margin-bottom: 8px; }
+        .queue-list { list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto; }
+        .queue-list li { padding: 4px 0; font-size: 0.9em; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .queue-empty { color: #666; font-style: italic; font-size: 0.9em; }
         .log-box {
-            margin-top: 25px;
+            margin-top: 20px;
             background: #0f172a;
             padding: 15px;
             border-radius: 8px;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9em;
+            font-size: 0.85em;
             max-height: 150px;
             overflow-y: auto;
             border-left: 4px solid var(--text-color);
+            line-height: 1.5;
         }
+        .log-ok { color: var(--success-color); }
+        .log-err { color: var(--danger-color); }
+        .log-info { color: #aaa; }
     </style>
 </head>
 <body>
+<div class="container">
+    <h1>🎵 Super-Bot Radio</h1>
 
-    <div class="container">
-        <h1>🎵 Super-Bot Radio</h1>
-
-        <div class="status-bar">
-            <div class="status-indicator">
-                <div id="statusDot" class="dot"></div>
-                <span id="statusText">DÉCONNECTÉ</span>
-            </div>
-            <div>API: <span id="apiUrl">mybotsradio.onrender.com</span></div>
+    <div class="status-bar">
+        <div class="status-indicator">
+            <div id="statusDot" class="dot"></div>
+            <span id="statusText">DÉCONNECTÉ</span>
         </div>
+        <div style="font-size:0.85em;color:#aaa;">API : <span id="apiUrl"></span></div>
+    </div>
 
-        <div class="info-panel">
-            <div class="info-item">📻 Lecture actuelle : <span id="currentSong">Aucune</span></div>
-            <div class="info-item">⏭️ Prochaine musique : <span id="nextSong">Aucune</span></div>
-        </div>
+    <div class="info-panel">
+        <div class="info-item">📻 En cours : <span id="currentSong">Aucune</span></div>
+        <div class="info-item">⏭️ Suivante : <span id="nextSong">Aucune</span></div>
+        <div class="info-item">📋 File : <span id="queueLength">0</span> morceau(x)</div>
+    </div>
 
-        <div class="control-section">
-            <input type="text" id="musicUrl" placeholder="Collez un lien YouTube, Spotify ou Deezer (Titre, Album, Playlist)...">
-            
-            <div class="btn-group">
-                <button class="btn-inject" onclick="injectMusic()">🚀 Injecter dans la Radio</button>
-                <button class="btn-skip" onclick="skipMusic()">⏭️ Passer</button>
-            </div>
-        </div>
-
-        <div class="log-box" id="logBox">
-            [Système] Prêt. Connectez le bot sur Discord avec la commande !music play pour commencer.
+    <div class="control-section">
+        <input type="text" id="musicUrl" placeholder="Collez un lien YouTube (ex: https://youtu.be/...)">
+        <div class="btn-group">
+            <button class="btn-inject" onclick="injectMusic()">🚀 Ajouter</button>
+            <button class="btn-skip" onclick="skipMusic()">⏭️ Passer</button>
+            <button class="btn-stop" onclick="stopMusic()">⏹️ Stop</button>
         </div>
     </div>
 
-    <script>
-        // CONFIGURATION DU LIEN RENDER DE TON BOT
-        const BASE_URL = "https://mybotsradio.onrender.com";
+    <div class="queue-section">
+        <div class="queue-title">📋 File d'attente</div>
+        <ul class="queue-list" id="queueList">
+            <li class="queue-empty">File vide</li>
+        </ul>
+    </div>
 
-        function addLog(text) {
-            const logBox = document.getElementById('logBox');
-            logBox.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${text}`;
-            logBox.scrollTop = logBox.scrollHeight;
-        }
+    <div class="log-box" id="logBox">
+        <span class="log-info">[Système] Prêt. Connectez le bot sur Discord : <b>!music play</b></span>
+    </div>
+</div>
 
-        async function checkStatus() {
-            try {
-                const response = await fetch(`${BASE_URL}/status`);
-                if (!response.ok) throw new Error();
-                const data = await response.json();
+<script>
+    // ⚠️ Changez cette URL par l'URL de votre bot sur Render
+    const BASE_URL = "https://mybotsradio.onrender.com";
+    document.getElementById('apiUrl').textContent = BASE_URL.replace('https://', '');
 
-                document.getElementById('statusDot').className = "dot online";
-                document.getElementById('statusText').innerText = "EN LIGNE";
-                document.getElementById('currentSong').innerText = data.currentSong || "Aucune";
-                document.getElementById('nextSong').innerText = data.nextSong || "Aucune";
-            } catch (err) {
-                document.getElementById('statusDot').className = "dot";
-                document.getElementById('statusText').innerText = "DÉCONNECTÉ";
-                document.getElementById('currentSong').innerText = "Aucune (Bot éteint)";
-                document.getElementById('nextSong').innerText = "Aucune";
-            }
-        }
+    function addLog(text, type = 'info') {
+        const logBox = document.getElementById('logBox');
+        const cls = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : 'log-info';
+        logBox.innerHTML += `<br><span class="${cls}">[${new Date().toLocaleTimeString()}] ${text}</span>`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
 
-        async function injectMusic() {
-            const urlInput = document.getElementById('musicUrl');
-            const url = urlInput.value.trim();
+    async function checkStatus() {
+        try {
+            const res = await fetch(`${BASE_URL}/status`, { signal: AbortSignal.timeout(5000) });
+            if (!res.ok) throw new Error();
+            const data = await res.json();
 
-            if (!url) {
-                alert("Veuillez entrer un lien valide !");
-                return;
-            }
+            document.getElementById('statusDot').className = "dot online";
+            document.getElementById('statusText').innerText = "EN LIGNE";
+            document.getElementById('currentSong').innerText = data.currentSong || "Aucune";
+            document.getElementById('nextSong').innerText = data.nextSong || "Aucune";
+            document.getElementById('queueLength').innerText = data.queueLength ?? "?";
 
-            addLog("Envoi de la demande d'injection...");
-            
-            try {
-                const response = await fetch(`${BASE_URL}/api/play`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    addLog(data.message);
-                    urlInput.value = "";
+            // Mise à jour de la file
+            const queueRes = await fetch(`${BASE_URL}/api/queue`, { signal: AbortSignal.timeout(5000) });
+            if (queueRes.ok) {
+                const queueData = await queueRes.json();
+                const list = document.getElementById('queueList');
+                if (queueData.queue.length === 0) {
+                    list.innerHTML = '<li class="queue-empty">File vide</li>';
                 } else {
-                    addLog(`❌ Erreur : ${data.error}`);
-                    alert(data.error);
+                    list.innerHTML = queueData.queue
+                        .map((t, i) => `<li>${i + 1}. ${escapeHtml(t)}</li>`)
+                        .join('');
                 }
-            } catch (err) {
-                addLog("❌ Impossible de joindre le bot Render. Vérifiez qu'il est bien allumé.");
             }
-            checkStatus();
+        } catch {
+            document.getElementById('statusDot').className = "dot";
+            document.getElementById('statusText').innerText = "DÉCONNECTÉ";
+            document.getElementById('currentSong').innerText = "Aucune (bot éteint)";
+            document.getElementById('nextSong').innerText = "Aucune";
+            document.getElementById('queueLength').innerText = "0";
         }
+    }
 
-        async function skipMusic() {
-            addLog("Demande de passage à la musique suivante...");
-            try {
-                const response = await fetch(`${BASE_URL}/api/skip`, { method: 'POST' });
-                if (response.ok) {
-                    addLog("⏭️ Commande Skip envoyée au bot !");
-                }
-            } catch (err) {
-                addLog("❌ Erreur lors de la demande de Skip.");
+    async function injectMusic() {
+        const urlInput = document.getElementById('musicUrl');
+        const url = urlInput.value.trim();
+        if (!url) { alert("Veuillez entrer un lien valide !"); return; }
+
+        addLog("Envoi en cours...");
+        try {
+            const res = await fetch(`${BASE_URL}/api/play`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                addLog(data.message, 'ok');
+                urlInput.value = "";
+            } else {
+                addLog(`Erreur : ${data.error}`, 'err');
             }
-            setTimeout(checkStatus, 1000);
+        } catch {
+            addLog("Impossible de joindre le bot. Vérifiez qu'il tourne sur Render.", 'err');
         }
+        setTimeout(checkStatus, 1500);
+    }
 
-        // Vérification automatique toutes les 5 secondes
-        setInterval(checkStatus, 5000);
-        checkStatus();
-    </script>
+    async function skipMusic() {
+        addLog("Demande de skip...");
+        try {
+            const res = await fetch(`${BASE_URL}/api/skip`, { method: 'POST' });
+            const data = await res.json();
+            addLog(res.ok ? data.message : `Erreur : ${data.error}`, res.ok ? 'ok' : 'err');
+        } catch {
+            addLog("Erreur lors du skip.", 'err');
+        }
+        setTimeout(checkStatus, 1500);
+    }
+
+    async function stopMusic() {
+        addLog("Arrêt de la lecture...");
+        try {
+            const res = await fetch(`${BASE_URL}/api/stop`, { method: 'POST' });
+            const data = await res.json();
+            addLog(res.ok ? data.message : `Erreur : ${data.error}`, res.ok ? 'ok' : 'err');
+        } catch {
+            addLog("Erreur lors de l'arrêt.", 'err');
+        }
+        setTimeout(checkStatus, 1500);
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // Appui Entrée dans le champ = Ajouter
+    document.getElementById('musicUrl').addEventListener('keydown', e => {
+        if (e.key === 'Enter') injectMusic();
+    });
+
+    setInterval(checkStatus, 5000);
+    checkStatus();
+</script>
 </body>
 </html>
