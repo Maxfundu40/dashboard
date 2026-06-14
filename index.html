@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super-Bot Control Panel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #0f0f12;
+            color: #f1f1f7;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #7289da;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        .dashboard {
+            background: #181820;
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border: 1px solid #2a2a35;
+        }
+        .status-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a2a35;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            background: #ff4d4d;
+        }
+        .status-badge.online {
+            background: #2ec4b6;
+            color: #0f0f12;
+        }
+        .info-group {
+            margin-bottom: 20px;
+        }
+        .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #7289da;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        .value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            background: #111116;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #22222b;
+            word-break: break-word;
+        }
+        .form-group {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input[type="text"] {
+            background: #111116;
+            border: 1px solid #3a3a4a;
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #7289da;
+        }
+        button {
+            background: #7289da;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #5b73c7;
+        }
+        .btn-skip {
+            background: #e63946;
+            margin-top: 10px;
+        }
+        .btn-skip:hover {
+            background: #c82333;
+        }
+        .alert {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+        .alert.success { background: rgba(46, 196, 182, 0.2); color: #2ec4b6; }
+        .alert.error { background: rgba(230, 57, 70, 0.2); color: #e63946; }
+    </style>
+</head>
+<body>
+
+    <h1>🤖 Super-Bot Hub</h1>
+    <div class="subtitle">YouTube • Spotify • Deezer Fusion Playlist</div>
+
+    <div class="dashboard">
+        <div class="status-container">
+            <span>État du Système</span>
+            <div id="status" class="status-badge">Hors ligne</div>
+        </div>
+
+        <div class="info-group">
+            <div class="label">🔊 En cours de diffusion :</div>
+            <div id="current" class="value">Aucune donnée</div>
+        </div>
+
+        <div class="info-group">
+            <div class="label">⏭️ Prochain titre :</div>
+            <div id="next" class="value" style="color: #aaa;">Aucune donnée</div>
+        </div>
+
+        <div class="form-group">
+            <div class="label">Ajouter une playlist ou un titre :</div>
+            <input type="text" id="url-input" placeholder="Colle un lien YT, Spotify ou Deezer...">
+            <button onclick="addMusic()">Injecter dans la Playlist</button>
+            <button class="btn-skip" onclick="skipMusic()">Passer le morceau actuel</button>
+            <div id="alert-box" class="alert"></div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ REMPLACE PAR L'URL UNIQUE DE TON NOUVEAU BOT SUR RENDER
+        const BASE_URL = "https://bot-radio-unique-id.onrender.com"; 
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch(`${BASE_URL}/status`);
+                const data = await res.json();
+                
+                const badge = document.getElementById('status');
+                badge.textContent = "En ligne";
+                badge.className = "status-badge online";
+                
+                document.getElementById('current').textContent = data.currentSong;
+                document.getElementById('next').textContent = data.nextSong;
+            } catch (err) {
+                const badge = document.getElementById('status');
+                badge.textContent = "Hors ligne";
+                badge.className = "status-badge";
+            }
+        }
+
+        async function addMusic() {
+            const input = document.getElementById('url-input');
+            const alertBox = document.getElementById('alert-box');
+            const url = input.value.trim();
+            if(!url) return;
+
+            showAlert("Envoi du lien et extraction de la playlist en cours...", "success");
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/play`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    showAlert(data.message, "success");
+                    input.value = "";
+                    fetchStatus();
+                } else {
+                    showAlert(data.error, "error");
+                }
+            } catch (err) {
+                showAlert("Erreur réseau ou bot éteint.", "error");
+            }
+        }
+
+        async function skipMusic() {
+            try {
+                await fetch(`${BASE_URL}/api/skip`, { method: 'POST' });
+                showAlert("Commande Skip envoyée !", "success");
+                setTimeout(fetchStatus, 1000);
+            } catch (err) {
+                showAlert("Impossible de passer la musique.", "error");
+            }
+        }
+
+        function showAlert(text, type) {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.textContent = text;
+            alertBox.className = `alert ${type}`;
+            alertBox.style.display = "block";
+        }
+
+        setInterval(fetchStatus, 4000);
+        fetchStatus();
+    </script>
+</body>
+</html>
